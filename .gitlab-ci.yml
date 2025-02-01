@@ -1,0 +1,24 @@
+stages:
+  - build
+  - deploy
+
+convert_video:
+  stage: build
+  image: ubuntu:latest
+  before_script:
+    - apt-get update && apt-get install -y ffmpeg
+  script:
+    - ffmpeg -i public/media/video.mp4 -profile:v baseline -level 3.0 -start_number 0 -hls_time 10 -hls_list_size 0 -f hls public/media/video.m3u8
+  artifacts:
+    paths:
+      - public
+
+pages:
+  stage: deploy
+  script:
+    - echo "The site will be deployed to $CI_PAGES_URL"
+  artifacts:
+    paths:
+      - public
+  only:
+    - main
